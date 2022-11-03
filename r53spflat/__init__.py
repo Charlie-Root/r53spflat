@@ -18,6 +18,7 @@ def flatten(
     update_subject,
     fromaddress,
     toaddress,
+    firstrec,
     update=False,
     email=True,
     lastresult=None,
@@ -62,7 +63,10 @@ def flatten(
                 numrecs = len(records)
                 print(f'\n**** Updating {numrecs} SPF Records for domain {domain}\n')        
                 for i in range(0,numrecs):
-                    recname = f'spf{i}.{domain}'
+                    if i == 0:
+                        recname = f'{firstrec}.{domain}'
+                    else:
+                        recname = f'spf{i}.{domain}'
                     print(f'===> Updating {recname} TXT record..', end='')
                     if r53zone.update(recname, records[i],addok=True):
                         print(f'..Successfully updated\n')
@@ -90,6 +94,7 @@ def main(args):
             email_server=args.mailserver,
             fromaddress=args.fromaddr,
             toaddress=args.toaddr,
+            firstrec=args.firstrec,
             email_subject=args.subject,
             update_subject=args.update_subject,
             update=args.update,

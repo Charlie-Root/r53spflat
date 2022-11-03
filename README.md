@@ -63,7 +63,7 @@ optional arguments:
 * The executable is installed in bin of the venv as `r53spflat`
 ### 2. Create an anchor SPF record for the zone apex in Route53
 
-Create the TXT SPF record on zone apex used (e.g. example.com), At the end of this anchor record include the first SPF record that slpat will write - spf0.example.com
+Create the TXT SPF record on zone apex used (e.g. example.com), At the end of this anchor record include the first SPF record that slpat will write - spf0.example.com by default.
  * we also include our own `ip4` and `ip6` entries in this anchor record. 
 ```
 example.com TXT "v=spf1 mx include:spf0.example.com -all"
@@ -99,7 +99,8 @@ Create a spfs.json file.  Add all the entries required:
         "update_subject" : "[NOTICE] SPF Records for {zone} have been updated.",
         "server": "smtp.example.com"
     },
-    "output": "monitor_sums.json"
+    "output": "monitor_sums.json",
+    "first record": "spf-subdomain"
 }
 ```
 #### Config file details
@@ -115,6 +116,7 @@ Create a spfs.json file.  Add all the entries required:
     * `from` - is **required** - the source email of the messages `r53spflat` sends
     * `server` - is **required** - your mail relay.
 * `output` is the file that maintains the existing state and checksum of sender records. If this is not specified `spfs_sum.json` is used.
+* `first record` is **optional** - this is the exact subdomain where the first record will be written to. The default is spf0.
 #### Output file details
 * The `output` file is a JSON file only updated if it is new (empty) or the records have been updated. 
 * Likewise the default output file is `spf_sums.json` but can be changed in the config file or by the `--output` switch.

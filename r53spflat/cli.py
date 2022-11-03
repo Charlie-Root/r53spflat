@@ -71,6 +71,7 @@ def parse_arguments():
         arguments.domains = settings["sending domains"]
         if not arguments.output:
             arguments.output = settings.get("output", "spf_sums.json")
+        arguments.firstrec = settings.get("first record", "spf0")
 
     if arguments.sendemail:
         required_non_config_args = all(

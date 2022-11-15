@@ -56,6 +56,15 @@ def parse_arguments():
         action="store_false",
     )
 
+    parser.add_argument(
+        "--one-record",
+        help="force all flattened IPs into one record",
+        dest='one_record',
+        default=False,
+        required=False,
+        action="store_true",
+    )
+
     arguments = parser.parse_args()
     
     with open(arguments.config) as config:
@@ -96,8 +105,16 @@ def parse_arguments():
     return arguments
 
 
-def main():
+def main(update=None, force_update=None, sendemail=None, one_record=None):
     args = parse_arguments()
+    if update is not None:
+        args.update = update
+    if force_update is not None:
+        args.force_update = force_update
+    if sendemail is not None:
+        args.sendemail = sendemail
+    if one_record is not None:
+        args.one_record = one_record
     r53spflat.main(args)
 
 

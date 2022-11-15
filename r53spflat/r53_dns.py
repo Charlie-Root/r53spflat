@@ -194,7 +194,7 @@ class TXTrec(Rt53rec):
         super().__init__(domain,'TXT')
 
 
-    def _quote_txt(self, contents):
+    def _quote_txt(self, contents, oneline=False):
         """ TXT records must be quoted and in 255 byte strings """
 
         if type(contents) is not list:
@@ -203,11 +203,19 @@ class TXTrec(Rt53rec):
         results = []
         for content in contents:
             quoted = f'"{content}"'
-            if len(quoted) > 255:
+            qo = ''
+            while len(quoted) > 255:
                 # break into separate quoted strings on 
                 # nearest space.
                 i = quoted[:254].rfind(' ')
-                quoted = quoted[:i] +'" "' + quoted[i:]
+                if oneline:
+                    qo = qo + quoted[:i] + '" "'
+                    quoted = quoted[i:]
+                else:
+                    quoted = quoted[:i] + '" "' + quoted[i:]
+                    break
+            if oneline:
+                quoted = qo + quoted
             results.append(quoted)
 
         return results
@@ -233,9 +241,9 @@ class TXTrec(Rt53rec):
         return super().add(name, self._quote_txt(contents))
 
 
-    def update(self, name, contents, addok=False):
+    def update(self, name, contents, addok=False, oneline=False):
 
-        return super().update(name, self._quote_txt(contents), addok)
+        return super().update(name, self._quote_txt(contents, oneline), addok)
 
 
     def get(self, name):

@@ -1,7 +1,7 @@
 Route53 SPF Flattener
 =======
 
-* `r53spflat` is an extension to [sender-policy-flattener](https://github.com/cetanu/sender_policy_flattener) which is a different project maintaind by ***centanu***.
+* `r53spflat` is an extension to [sender-policy-flattener](https://github.com/cetanu/sender_policy_flattener) which is a different project maintained by ***centanu***.
 * `r53spflat` can update the SPF TXT records in [Amazon Route53](https://aws.amazon.com/route53)
 * `r53spflat` was adapted from [`cfspflat`](https://github.com/Glocktober/cfspflat) - which provides the same capability for Cloudflare DNS
 
@@ -38,6 +38,7 @@ optional arguments:
   --update-records      Update SPF records in Route53
   --force-update        Force an update of SPF records in Route53
   --no-email            don't send the email
+  --one-record          force all flattened IPs into one record
 ```
 * The `sender-policy-flattener` python module is installed as part of `r53spflat`
 * The existing core of `spflat` is kept mostly intact, so the basic features are maintained by `r53spflat`.  
@@ -51,13 +52,13 @@ optional arguments:
 
 ### 1. pip install the r53spflat module
 ```bash
-% pip install r53spflat
+% pip install git+ssh://github.com/AcroMedia/r53spflat
 ```
 * But it's advisable to do this in its own venv:
 ```bash
 % python3 -m venv spfenv
 % source spfenv/bin/activate
-% pip install r53spflat
+% pip install git+ssh://github.com/AcroMedia/r53spflat
 ```
 * pip will install the prerequisites, including the `sender-policy-flattner` (spflat), `dnspython`, `netaddr`, and `boto3` python modules.
 * The executable is installed in bin of the venv as `r53spflat`
@@ -69,6 +70,7 @@ Create the TXT SPF record on zone apex used (e.g. example.com), At the end of th
 example.com TXT "v=spf1 mx include:spf0.example.com -all"
 ```
 * This anchor record is never changed by `r53spflat`. It's purpose is to link to the first SPF record in the chain that `r53spflat` manages.
+* Run r53spflat with the `--one-record` switch if you prefer to it manage a single record instead of a chain of includes. 
 
 ### 2. Edit the r53spflat configuration file
 Create a spfs.json file.  Add all the entries required:

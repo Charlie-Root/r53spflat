@@ -1,5 +1,6 @@
 # coding=utf-8
 import json
+import re
 from dns.resolver import Resolver
 from sender_policy_flattener.crawler import spf2ips
 from sender_policy_flattener.formatting import sequence_hash
@@ -22,7 +23,8 @@ def flatten(
     update=False,
     email=True,
     lastresult=None,
-    force_update=False
+    force_update=False,
+    one_record=False
 ):
     resolver = Resolver()
     if dns_servers:
@@ -32,6 +34,13 @@ def flatten(
     current = dict()
     for domain, spf_targets in input_records.items():
         records = spf2ips(spf_targets, domain, resolver)
+        if one_record:
+            # alternative to passing a larger number of bytes in fit_bytes()
+            result = 'v=spf1 '
+            for record in records:
+                record = record[7:]
+                result = result + re.split("include:spf.*", record)[0]
+            records = [result]
         hashsum = sequence_hash(records)
         current[domain] = {"sum": hashsum, "records": records}
         if lastresult.get(domain, False) and current.get(domain, False):
@@ -68,7 +77,7 @@ def flatten(
                     else:
                         recname = f'spf{i}.{domain}'
                     print(f'===> Updating {recname} TXT record..', end='')
-                    if r53zone.update(recname, records[i],addok=True):
+                    if r53zone.update(recname, records[i], addok=True, oneline=one_record):
                         print(f'..Successfully updated\n')
                     else:
                         print(f'Failed!\n\n********** WARNING: Update of {recname} TXT record Failed\n')
@@ -100,6 +109,7 @@ def main(args):
             update=args.update,
             email=args.sendemail,
             force_update=args.force_update,
+            one_record=args.one_record
         )
         with open(args.output, "w+") as f:
             json.dump(spf, f, indent=4, sort_keys=True)

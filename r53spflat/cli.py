@@ -9,7 +9,7 @@ import argparse
 import r53spflat
 
 # noinspection PyMissingOrEmptyDocstring
-def parse_arguments():
+def parse_arguments(config=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "-c",
@@ -66,7 +66,8 @@ def parse_arguments():
     )
 
     arguments = parser.parse_args()
-    
+    if config is not None:
+        arguments.config = config
     with open(arguments.config) as config:
         settings = json.load(config)
         arguments.resolvers = settings.get("resolvers",[])
@@ -105,8 +106,8 @@ def parse_arguments():
     return arguments
 
 
-def main(update=None, force_update=None, sendemail=None, one_record=None):
-    args = parse_arguments()
+def main(update=None, force_update=None, sendemail=None, one_record=None, config=None):
+    args = parse_arguments(config=config)
     if update is not None:
         args.update = update
     if force_update is not None:

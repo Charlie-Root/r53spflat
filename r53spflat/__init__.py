@@ -33,14 +33,25 @@ def flatten(
         lastresult = dict()
     current = dict()
     for domain, spf_targets in input_records.items():
+        raw_ips = ''
+        for target in list(spf_targets.keys()):
+            if spf_targets[target] == 'ip':
+                raw_ips = raw_ips + target + ' '
+                del spf_targets[target]
         records = spf2ips(spf_targets, domain, resolver)
         if one_record:
             # alternative to passing a larger number of bytes in fit_bytes()
             result = 'v=spf1 '
             for record in records:
                 record = record[7:]
-                result = result + re.split("include:spf.*", record)[0]
-            records = [result]
+                result = result + re.split("include:spf.*", record)[0] + '" "'
+            if raw_ips:
+                result = result[:7] + raw_ips + '" "' + result[7:]
+            records = [result[:-3]]
+        else:
+            # will fail if the last record is too long to insert an include
+            records[-1] = records[-1][:-4] + 'include:spf-raw-ips.' + domain + ' -all'
+            records.append(f'v=spf1 {raw_ips}-all')
         hashsum = sequence_hash(records)
         current[domain] = {"sum": hashsum, "records": records}
         if lastresult.get(domain, False) and current.get(domain, False):
@@ -70,10 +81,12 @@ def flatten(
             if (mismatch and update) or force_update:
                 r53zone = TXTrec(domain)
                 numrecs = len(records)
-                print(f'\n**** Updating {numrecs} SPF Records for domain {domain}\n')        
+                print(f'\n**** Updating {numrecs} SPF Records for domain {domain}\n')      
                 for i in range(0,numrecs):
                     if i == 0:
                         recname = f'{firstrec}.{domain}'
+                    elif i == numrecs - 1 and raw_ips and not one_record:
+                        recname = f'spf-raw-ips.{domain}'
                     else:
                         recname = f'spf{i}.{domain}'
                     print(f'===> Updating {recname} TXT record..', end='')

@@ -110,6 +110,7 @@ Create a spfs.json file.  Add all the entries required:
 * Each sending domain contains dns spf records for the dns `include` records of your approved senders.These dns names are resolved and flattened:
   * These entries are in the key-value pairs of <fqdn> : <record type>.
   * Record type can be "txt" (other SPF records),  "A" and "AAAA" records (for specific hosts).
+  * Use the record type "ip" for raw `ip4` and `ip6` entries.
 * The `resolvers` section is **optional** (using the system default DNS resolvers if none are supplied)
 * The `email` stanza is **required** and is global (i.e. for all `sending domains`).  This section includes:
   * `subject` **(optional)** is the email subject if a change was detected but no updates were made. The default message is the one shown in the example.

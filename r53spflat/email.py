@@ -40,9 +40,6 @@ def email_changes(
     prev = sorted([s for s in prev_addrs.split() if "ip" in s])
     curr = sorted([s for s in curr_addrs.split() if "ip" in s])
 
-    print("Do we have a API Key?")
-    print(api_key)
-
     diff = HtmlDiff()
     table = diff.make_table(
         fromlines=prev, tolines=curr, fromdesc="Old records", todesc="New records"

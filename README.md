@@ -38,6 +38,7 @@ optional arguments:
   --update-records      Update SPF records in Route53
   --force-update        Force an update of SPF records in Route53
   --no-email            don't send the email
+  --email-authentcation use SMTP authentication for email
   --one-record          force all flattened IPs into one record
 ```
 * The `sender-policy-flattener` python module is installed as part of `r53spflat`

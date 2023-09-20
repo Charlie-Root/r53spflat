@@ -4,8 +4,8 @@ import re
 from dns.resolver import Resolver
 from sender_policy_flattener.crawler import spf2ips
 from sender_policy_flattener.formatting import sequence_hash
-from sender_policy_flattener.email_utils import email_changes
 from .r53_dns import TXTrec
+from .email import email_changes
 
 if "FileNotFoundError" not in locals():
     FileNotFoundError = IOError
@@ -24,7 +24,8 @@ def flatten(
     email=True,
     lastresult=None,
     force_update=False,
-    one_record=False
+    one_record=False,
+    api_key=''
 ):
     resolver = Resolver()
     if dns_servers:
@@ -77,6 +78,7 @@ def flatten(
                     server=email_server,
                     fromaddr=fromaddress,
                     toaddr=toaddress,
+                    api_key=api_key
                 )
             if (mismatch and update) or force_update:
                 r53zone = TXTrec(domain)
@@ -122,7 +124,8 @@ def main(args):
             update=args.update,
             email=args.sendemail,
             force_update=args.force_update,
-            one_record=args.one_record
+            one_record=args.one_record,
+            api_key=args.api_key
         )
         with open(args.output, "w+") as f:
             json.dump(spf, f, indent=4, sort_keys=True)

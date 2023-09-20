@@ -78,6 +78,7 @@ def parse_arguments(config=None):
         arguments.update_subject = settings["email"].get("update_subject",
             "[NOTICE] SPF records for {zone} have been updated.")
         arguments.mailserver = settings["email"]["server"]
+        arguments.api_key = settings["email"]["api_key"]
         arguments.domains = settings["sending domains"]
         if not arguments.output:
             arguments.output = settings.get("output", "spf_sums.json")
@@ -92,6 +93,7 @@ def parse_arguments(config=None):
                 arguments.update_subject,
                 arguments.mailserver,
                 arguments.domains,
+                arguments.api_key
             ]
         )
     else:    

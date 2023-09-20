@@ -1,5 +1,6 @@
 __pycache__
 *.json
+result.html
 junk
 pack
 dist
